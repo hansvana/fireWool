@@ -14,22 +14,24 @@ class Spark {
         };
         this.age = Math.random()*50 +50;
         this.killMe = false;
+        this.sprite = Math.floor((Math.random()*15)*30);
     }
     update(canvas){
         this.vec.y+=.5;
         this.pos.x+=this.vec.x;
         this.pos.y+=this.vec.y;
         if (this.pos.y > canvas.height) {
-            this.vec.x *= .5;
-            this.vec.y = Math.max(this.vec.y*-.5,-15);;
+            this.vec.x += Math.random()*10 -5;
+            this.vec.y = Math.random()*10 -10;
             this.pos.y = canvas.height;
+            this.age -= this.age/2;
         }
 
         this.age--;
         if (this.age <= 0 ) this.killMe = true;
     }
-    render(context){
-        context.fillRect(this.pos.x,this.pos.y,this.age/10,this.age/10);
+    render(context,img){
+        context.drawImage(img,this.sprite,0,30,30,this.pos.x,this.pos.y,30,30);
     }
 }
 
@@ -60,6 +62,9 @@ class OriginPoint {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    let spritesheet = new Image();
+    spritesheet.src = "sparks.png";
+
     let origin = new OriginPoint({
             x: canvas.width*.5,
             y: canvas.height*.5
@@ -73,7 +78,7 @@ class OriginPoint {
         origin.update();
         origin.render(context);
 
-        context.fillStyle = "#f00";
+        context.fillStyle = "#ff0";
 
         let pos = origin.getPars();
         for (let i = 0; i < Math.random()*10+5; i++) {
@@ -82,11 +87,12 @@ class OriginPoint {
 
         sparks = sparks.filter(spark => {
            spark.update(canvas);
-           spark.render(context);
+           spark.render(context,spritesheet);
 
             return !spark.killMe;
         });
 
+        context.filter = "blur(5px)";
 
         window.requestAnimationFrame(() => {
            render(canvas,context);

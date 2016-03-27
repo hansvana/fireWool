@@ -22,6 +22,7 @@ var Spark = function () {
         };
         this.age = Math.random() * 50 + 50;
         this.killMe = false;
+        this.sprite = Math.floor(Math.random() * 15 * 30);
     }
 
     _createClass(Spark, [{
@@ -31,9 +32,10 @@ var Spark = function () {
             this.pos.x += this.vec.x;
             this.pos.y += this.vec.y;
             if (this.pos.y > canvas.height) {
-                this.vec.x *= .5;
-                this.vec.y = Math.max(this.vec.y * -.5, -15);;
+                this.vec.x += Math.random() * 10 - 5;
+                this.vec.y = Math.random() * 10 - 10;
                 this.pos.y = canvas.height;
+                this.age -= this.age / 2;
             }
 
             this.age--;
@@ -41,8 +43,8 @@ var Spark = function () {
         }
     }, {
         key: "render",
-        value: function render(context) {
-            context.fillRect(this.pos.x, this.pos.y, this.age / 10, this.age / 10);
+        value: function render(context, img) {
+            context.drawImage(img, this.sprite, 0, 30, 30, this.pos.x, this.pos.y, 30, 30);
         }
     }]);
 
@@ -92,6 +94,9 @@ var OriginPoint = function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    var spritesheet = new Image();
+    spritesheet.src = "sparks.png";
+
     var origin = new OriginPoint({
         x: canvas.width * .5,
         y: canvas.height * .5
@@ -105,7 +110,7 @@ var OriginPoint = function () {
         origin.update();
         origin.render(context);
 
-        context.fillStyle = "#f00";
+        context.fillStyle = "#ff0";
 
         var pos = origin.getPars();
         for (var i = 0; i < Math.random() * 10 + 5; i++) {
@@ -114,10 +119,12 @@ var OriginPoint = function () {
 
         sparks = sparks.filter(function (spark) {
             spark.update(canvas);
-            spark.render(context);
+            spark.render(context, spritesheet);
 
             return !spark.killMe;
         });
+
+        context.filter = "blur(5px)";
 
         window.requestAnimationFrame(function () {
             render(canvas, context);
